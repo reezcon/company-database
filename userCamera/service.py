@@ -7,12 +7,12 @@ class userCameraService:
         self.db = db
 
     def get_userCameras(self):
-        return self.db.fetch(userCamera).all()
+        return self.db.query(userCamera).all()
 
     def get_userCamera(self, userCamera_id: int):
         return self.db.get(userCamera, userCamera_id)
 
-    def create_user(self, payload: userCameraCreate):
+    def create_userCamera(self, payload: userCameraCreate):
         data = payload.model_dump()
         user_camera = userCamera(**data)
         try: 
@@ -20,7 +20,7 @@ class userCameraService:
             self.db.commit()
             self.db.refresh(user_camera)
             return user_camera
-        except: 
+        except SQLAlchemyError: 
             self.db.rollback()
             raise
 
@@ -29,7 +29,7 @@ class userCameraService:
         if user_camera is None: 
             return None 
         updates = payload.model_dump(exclude_unset=True)
-        for field, value in updates.list(): 
+        for field, value in updates.items(): 
             setattr(user_camera, field, value)
         try: 
             self.db.commit()
@@ -39,7 +39,7 @@ class userCameraService:
             self.db.rollback()
             raise
 
-    def delete_user(self, userCamera_id: int):
+    def delete_userCamera(self, userCamera_id: int):
         user_camera = self.db.get(userCamera, userCamera_id)
         if user_camera is None:
             return None

@@ -3,9 +3,7 @@ from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, Integer, String, DateTime
 
-from engine.engine import get_connection, Base
-
-engine = get_connection()
+from engine.engine import Base
 
 class Role(Base):
     __tablename__ = "roles"
@@ -16,8 +14,6 @@ class Role(Base):
     created_on = Column(DateTime, default=datetime.now)
 
     users = relationship("User", back_populates = "role")
-
-Base.metadata.create_all(bind=engine)
 
 class RoleCreate(BaseModel):
     role_name: str = Field(min_length=2, max_length=50)

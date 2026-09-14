@@ -1,9 +1,7 @@
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from engine.engine import get_connection, Base
-
-engine = get_connection()
+from engine.engine import Base
 
 class Department(Base):
     __tablename__ = "departments"
@@ -13,8 +11,6 @@ class Department(Base):
     description = Column(String(255), nullable=True)
 
     users = relationship("User", back_populates = "department")
-
-Base.metadata.create_all(bind=engine)
 
 class DepartmentCreate(BaseModel):
     department_name: str = Field(min_length=2, max_length=50)

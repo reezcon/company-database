@@ -1,9 +1,7 @@
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from engine.engine import get_connection, Base
-
-engine = get_connection()
+from engine.engine import Base
 
 class Camera(Base):
     __tablename__ = "cameras"
@@ -17,9 +15,7 @@ class Camera(Base):
     site = Column(String(100))
     rtsp_url = Column(String, nullable=False)
 
-    user_cameras = relationship("UserCamera", back_populates="camera", cascade="all, delete-orphan")
-
-Base.metadata.create_all(bind=engine)
+    user_cameras = relationship("userCamera", back_populates="camera", cascade="all, delete-orphan")
 
 class CameraCreate(BaseModel):
     camera_name: str = Field(min_length=2, max_length=100)

@@ -4,9 +4,7 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from engine.engine import get_connection, Base
-
-engine = get_connection()
+from engine.engine import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -18,22 +16,20 @@ class User(Base):
     phone_number = Column("phone_number", String(13), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     picture = Column(String)    
-    department_id = Column(Integer, ForeignKey("departments.department_id"), nullable=True, index=True)
-    role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=True, index=True)
+    department_id = Column(Integer, ForeignKey("departments.department_id", ondelete="RESTRICT"), nullable=True, index=True)
+    role_id = Column(Integer, ForeignKey("roles.role_id", ondelete="RESTRICT"), nullable=True, index=True)
     created_on = Column(DateTime, default=datetime.now)
 
     department = relationship("Department", back_populates="users")
     role = relationship("Role", back_populates="users")
-    user_cameras = relationship("UserCamera", back_populates="user", cascade = "all, delete-orphan")
-    
-Base.metadata.create_all(bind=engine)
+    user_cameras = relationship("userCamera", back_populates="user", cascade="all, delete-orphan")
 
 class UserCreate(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     username: str = Field(min_length=2, max_length=100)
     email: EmailStr
     phone_number: str = Field(min_length=13, max_length=13)
-    picture: str = Field(max_length=100)
+    picture: str = Field(max_length=100)    
     department_id: int | None = None
     role_id: int | None = None
     password: str = Field(min_length=8, max_length=50)

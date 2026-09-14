@@ -19,6 +19,7 @@ class DepartmentService:
             self.db.add(department)
             self.db.commit()
             self.db.refresh(department)
+            return department
         except SQLAlchemyError:
             self.db.rollback()
             raise

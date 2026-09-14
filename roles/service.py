@@ -17,7 +17,7 @@ class RoleService:
         role = Role(**data)
         try: 
             self.db.add(role)
-            self.commit()
+            self.db.commit()
             self.db.refresh(role)
             return role
         except SQLAlchemyError:

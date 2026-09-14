@@ -1,16 +1,16 @@
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, ForeignKey, Integer, String
-
-from engine.engine import get_connection, Base
-
-engine = get_connection()
+from sqlalchemy.orm import relationship
+from engine.engine import Base
 
 class userCamera(Base):
+    __tablename__ = "user_cameras"
     userCamera_id = Column(Integer, primary_key= True, index = True)
-    user_id = Column(Integer, ForeignKey= "user.user_id", nullable=False, index = True)
-    camera_id = Column(Integer, ForeignKey="camera.camera_id", nullable=False, index= True)
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, index=True)
+    camera_id = Column(Integer, ForeignKey("cameras.camera_id", ondelete="CASCADE"), nullable=False, index=True)
 
-Base.metadata.create_all(bind=engine)
+    user = relationship("User", back_populates="user_cameras")
+    camera = relationship("Camera", back_populates="user_cameras")
 
 class userCameraCreate(BaseModel):
     user_id: int 
