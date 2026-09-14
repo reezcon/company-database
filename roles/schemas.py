@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, Integer, String, DateTime
 
@@ -14,6 +14,8 @@ class Role(Base):
     role_name = Column(String(50), unique=True, nullable=False, index = True)
     description = Column(String(254), nullable=True)
     created_on = Column(DateTime, default=datetime.now)
+
+    users = relationship("User", back_populates = "role")
 
 Base.metadata.create_all(bind=engine)
 

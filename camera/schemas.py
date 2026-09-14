@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, Integer, String
-
+from sqlalchemy.orm import relationship
 from engine.engine import get_connection, Base
 
 engine = get_connection()
@@ -16,6 +16,8 @@ class Camera(Base):
     state = Column(String(50))
     site = Column(String(100))
     rtsp_url = Column(String, nullable=False)
+
+    user_cameras = relationship("UserCamera", back_populates="camera", cascade="all, delete-orphan")
 
 Base.metadata.create_all(bind=engine)
 

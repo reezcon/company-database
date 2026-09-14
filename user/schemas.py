@@ -22,6 +22,10 @@ class User(Base):
     role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=True, index=True)
     created_on = Column(DateTime, default=datetime.now)
 
+    department = relationship("Department", back_populates="users")
+    role = relationship("Role", back_populates="users")
+    user_cameras = relationship("UserCamera", back_populates="user", cascade = "all, delete-orphan")
+    
 Base.metadata.create_all(bind=engine)
 
 class UserCreate(BaseModel):

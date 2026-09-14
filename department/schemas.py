@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, Integer, String
-
+from sqlalchemy.orm import relationship
 from engine.engine import get_connection, Base
 
 engine = get_connection()
@@ -11,6 +11,8 @@ class Department(Base):
     department_id = Column(Integer, primary_key=True, index=True)
     department_name = Column(String(50), nullable=False, index=True)
     description = Column(String(255), nullable=True)
+
+    users = relationship("User", back_populates = "department")
 
 Base.metadata.create_all(bind=engine)
 
