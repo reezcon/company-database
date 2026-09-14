@@ -51,7 +51,18 @@ class UserService:
             self.db.rollback()
             raise
 
-        
+    def check_duplicates(self, username: str = None, email: str=None, phone_number:str = None, exclude_user_id:int =None):
+        checks = [(User.username, username, "username"),
+                  (User.email, email, "email"),
+                  (User.phone_number, phone_number, "phone number")]
+        for column, value, label in checks:
+            if value is None:
+                continue
+            query = self.db.query(User).filter(column == value)
+            if exclude_user_id is not None:
+                query = query.filter(User.user_id != exclude_user_id)
+            if query.first() is not None:
+                raise ValueError(f"That {label} is already in use")
         
 
 """def get_users(db: Session):
