@@ -12,7 +12,17 @@ class DepartmentService:
     def get_department(self, department_id: int):
         return self.db.get(Department, department_id)
 
+    def _check_duplicates(self, department_name: str=None):
+        check= [(Department.department_name, department_name, "department_name")]
+        for column, value, label in check:
+            if value is None:
+                continue
+            query=self.db.query(Department).filter(column == value)
+            if query.first() is not None:
+                raise ValueError(f"That {label} already exists")
+
     def create_department(self, payload: DepartmentCreate):
+        self._check_duplicates(department_name=payload.department_name)
         data = payload.model_dump()
         department = Department(**data)
         try:
@@ -29,6 +39,9 @@ class DepartmentService:
         if department is None: 
             return None
         updates = payload.model_dump(exclude_unset=True)
+
+        self._check_duplicates(department_name=updates.get("department_name"))
+
         for field, value in updates.items():
             setattr(department, field, value)
         try: 
