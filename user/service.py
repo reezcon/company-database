@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from department.schemas import Department
+from roles.schemas import Role
 from user.schemas import User, UserCreate, UserUpdate
 
 class UserService:
@@ -12,7 +14,25 @@ class UserService:
     def get_user(self, user_id: int):
         return self.db.get(User, user_id)
 
+    def _check_duplicates(self, username: str = None, email: str=None, phone_number:str = None, exclude_user_id:int =None):
+            checks = [(User.username, username, "username"),
+                      (User.email, email, "email"),
+                      (User.phone_number, phone_number, "phone number")]
+            for column, value, label in checks:
+                if value is None:
+                    continue
+                query = self.db.query(User).filter(column == value)
+                if exclude_user_id is not None:
+                    query = query.filter(User.user_id != exclude_user_id)
+                if query.first() is not None:
+                    raise ValueError(f"That {label} is already in use")
+
     def create_user(self, payload: UserCreate):
+        self._check_duplicates(username=payload.username, email=payload.email, phone_number=payload.phone_number)
+        if payload.department_id is not None and self.db.get(Department, payload.department_id) is None:
+            raise LookupError("Department not found")
+        if payload.role_id is not None and self.db.get(Role, payload.role_id) is None:
+            raise LookupError("Role not found")
         data = payload.model_dump(exclude={"password"})
         user = User(**data, password = payload.password)
         try:
@@ -29,6 +49,12 @@ class UserService:
         if user is None:
             return None
         updates = payload.model_dump(exclude_unset=True)
+
+        self._check_duplicates(username=updates.get("username"),
+                               email=updates.get("email"),
+                               phone_number=updates.get("phone_number"),
+                               exclude_user_id=user_id)
+
         for field, value in updates.items():
             setattr(user, field, value)
         try:
@@ -51,18 +77,7 @@ class UserService:
             self.db.rollback()
             raise
 
-    def check_duplicates(self, username: str = None, email: str=None, phone_number:str = None, exclude_user_id:int =None):
-        checks = [(User.username, username, "username"),
-                  (User.email, email, "email"),
-                  (User.phone_number, phone_number, "phone number")]
-        for column, value, label in checks:
-            if value is None:
-                continue
-            query = self.db.query(User).filter(column == value)
-            if exclude_user_id is not None:
-                query = query.filter(User.user_id != exclude_user_id)
-            if query.first() is not None:
-                raise ValueError(f"That {label} is already in use")
+    
         
 
 """def get_users(db: Session):

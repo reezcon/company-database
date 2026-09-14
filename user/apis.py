@@ -28,6 +28,10 @@ async def read_user(user_id: int, db:Session = session):
 async def create_user(payload: UserCreate, db: Session = session):
     try:
         return service(db).create_user(payload)
+    except LookupError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error while creating user")
 
@@ -36,6 +40,8 @@ async def create_user(payload: UserCreate, db: Session = session):
 async def update_user(user_id: int, payload: UserUpdate, db: Session = session):
     try:
         user = service(db).update_user(user_id, payload)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error while updating user")
     if user is None: 
