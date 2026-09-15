@@ -12,7 +12,17 @@ class CameraService:
     def get_camera(self, camera_id: int):
         return self.db.get(Camera, camera_id)
 
+    def _check_duplicates(self, camera_name: str =None):
+        check = [Camera.camera_name, camera_name, "camera_name"]
+        for column, value, label in check:
+            if value is None:
+                continue
+            query = self.db.query(Camera). filter(column==value)
+            if query.first() is not None:
+                raise ValueError("That camera name is already in use")
+
     def create_camera(self, payload: CameraCreate):
+        self._check_duplicates(camera_name=payload.camera_name)
         data = payload.model_dump()
         camera = Camera(**data)
         try: 
@@ -29,6 +39,7 @@ class CameraService:
         if camera is None: 
             return None
         updates = payload.model_dump(exclude_unset=True)
+        self._check_duplicates(camera_name = updates.get("camera_name"))
         for field, value in updates.items():
             setattr(camera, field, value)
         try: 
