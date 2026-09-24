@@ -3,6 +3,9 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from engine.engine import Base
 
+from user.schemas import UserOut
+from camera.schemas import CameraOut
+
 class userCamera(Base):
     __tablename__ = "user_cameras"
     userCamera_id = Column(Integer, primary_key= True, index = True)
@@ -21,5 +24,5 @@ class userCameraUpdate(BaseModel):
     camera_id: int | None = None
 
 class userCameraOut(BaseModel):
-    user_id: int
-    camera_id: int
+    user: UserOut
+    camera: CameraOut
