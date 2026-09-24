@@ -14,7 +14,7 @@ class Watchlist(Base):
     description = Column(String(255), nullable=True)
 
 class WatchlistCreate(BaseModel):
-    watchlist_name = str = Field(min_length=2, max_length=100)
+    watchlist_name: str = Field(min_length=2, max_length=100)
     description: str | None = Field(default=None, max_length=255)
 
 class WatchlistOut(BaseModel):
