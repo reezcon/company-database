@@ -4,6 +4,10 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
+from department.schemas import DepartmentOut
+from roles.schemas import RoleOut
+from watchlist.schemas import WatchlistOut
+
 from engine.engine import Base
 
 class User(Base):
@@ -44,9 +48,9 @@ class UserOut(BaseModel):
     email: EmailStr
     phone_number: str
     picture: str
-    department_id: int | None = None
-    role_id: int | None = None
-    watchlist_id: int | None = None
+    department: DepartmentOut | None = None
+    role: RoleOut | None = None
+    watchlist: WatchlistOut | None = None
 
     class Config:
         #orm_mode = True
