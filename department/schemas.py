@@ -14,13 +14,16 @@ class Department(Base):
 
 class DepartmentCreate(BaseModel):
     department_name: str = Field(min_length=2, max_length=50)
-    description: str = Field(default=None, max_length=255)
+    description: str | None = Field(default=None, max_length=255)
 
 class DepartmentOut(BaseModel):
     department_id: int
     department_name: str
-    description: str
+    description: str | None = None
+
+    class Config:
+        from_attributes = True
 
 class DepartmentUpdate(BaseModel):
     department_name: str = Field(default=None, min_length=2, max_length=50)
-    description: str = Field(default = None, max_length= 255)
+    description: str | None = Field(default=None, max_length=255)

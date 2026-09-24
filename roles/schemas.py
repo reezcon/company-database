@@ -22,10 +22,10 @@ class RoleCreate(BaseModel):
 class RoleOut(BaseModel):
     role_id: int 
     role_name: str 
-    discription: str | None = None
+    description: str | None = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class RoleUpdate(BaseModel):
     role_name: str = Field(min_length=2, max_length=50)

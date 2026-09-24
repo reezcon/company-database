@@ -28,7 +28,7 @@ async def read_role(role_id: int, db:Session = session):
 @router.post("", response_model=RoleOut)
 async def create_role(payload: RoleCreate, db: Session= session):
     try:
-        return service(db).create_user(payload)
+        return service(db).create_role(payload)
     except ValueError as e:
             raise HTTPException(status_code=409, detail=str(e))
     except SQLAlchemyError:

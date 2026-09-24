@@ -13,13 +13,11 @@ class RoleService:
         return self.db.get(Role, role_id)
 
     def _check_duplicates(self, role_name: str = None):
-        check = [Role.role_name, role_name, "role_name"]
-        for column, value, label in check:
-            if value is None:
-                continue
-            query = self.db.query(Role).filter(column == value)
-            if query.first() is not None:
-                raise ValueError("That role already exists")
+        if role_name is None:
+            return
+        query = self.db.query(Role).filter(Role.role_name == role_name)
+        if query.first() is not None:
+            raise ValueError("That role already exists")
 
     def create_role(self, payload: RoleCreate):
         self._check_duplicates(role_name=payload.role_name)
@@ -40,7 +38,7 @@ class RoleService:
             return None
         updates = payload.model_dump(exclude_unset=True)
 
-        self._check_duplicates(role_id = updates.get("role_id"))
+        self._check_duplicates(role_name=updates.get("role_name"))
 
         for field, value in updates.items():
             setattr(role, field, value)

@@ -13,13 +13,11 @@ class DepartmentService:
         return self.db.get(Department, department_id)
 
     def _check_duplicates(self, department_name: str=None):
-        check= [(Department.department_name, department_name, "department_name")]
-        for column, value, label in check:
-            if value is None:
-                continue
-            query=self.db.query(Department).filter(column == value)
-            if query.first() is not None:
-                raise ValueError(f"That {label} already exists")
+        if department_name is None:
+            return
+        query = self.db.query(Department).filter(Department.department_name==department_name)
+        if query.first() is not None:
+            raise ValueError("That department already exists")
 
     def create_department(self, payload: DepartmentCreate):
         self._check_duplicates(department_name=payload.department_name)
