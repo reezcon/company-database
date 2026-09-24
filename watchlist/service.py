@@ -15,7 +15,7 @@ class WatchlistService:
     def _check_duplicates(self, watchlist_name: str = None):
         if watchlist_name is None:
             return 
-        query = self.db.query(Watchlist).filter(Watchlist.name )
+        query = self.db.query(Watchlist).filter(Watchlist.watchlist_name == watchlist_name)
         if query.first() is not None:
             raise ValueError("That watchlist already exists")
 

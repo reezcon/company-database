@@ -13,13 +13,12 @@ class CameraService:
         return self.db.get(Camera, camera_id)
 
     def _check_duplicates(self, camera_name: str =None):
-        check = [Camera.camera_name, camera_name, "camera_name"]
-        for column, value, label in check:
-            if value is None:
-                continue
-            query = self.db.query(Camera). filter(column==value)
-            if query.first() is not None:
-                raise ValueError("That camera name is already in use")
+        if camera_name is None:
+            return
+        query = self.db.query(Camera).filter(Camera.camera_name == camera_name)
+        if query.first() is not None: 
+            raise ValueError("That camera name already exists")
+            
 
     def create_camera(self, payload: CameraCreate):
         self._check_duplicates(camera_name=payload.camera_name)
