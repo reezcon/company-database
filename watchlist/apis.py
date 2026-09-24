@@ -17,7 +17,7 @@ session = Depends(get_db)
 #         return str(e)
 # READ all roles
 @router.get("", response_model=list[WatchlistOut])
-async def read_watchlist(db: Session = session):
+async def read_watchlists(db: Session = session):
     return service(db).get_watchlists()
 
 @router.get("/{role_id}")
