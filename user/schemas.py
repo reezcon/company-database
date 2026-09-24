@@ -18,8 +18,10 @@ class User(Base):
     picture = Column(String)    
     department_id = Column(Integer, ForeignKey("departments.department_id", ondelete="RESTRICT"), nullable=True, index=True)
     role_id = Column(Integer, ForeignKey("roles.role_id", ondelete="RESTRICT"), nullable=True, index=True)
+    watchlist_id = Column(Integer, ForeignKey("watchlist.watchlist_id"), nullable = True, index= True)
     created_on = Column(DateTime, default=datetime.now)
 
+    watchlist = relationship("Watchlist", back_populates="users")
     department = relationship("Department", back_populates="users")
     role = relationship("Role", back_populates="users")
     user_cameras = relationship("userCamera", back_populates="user", cascade="all, delete-orphan")
@@ -32,6 +34,7 @@ class UserCreate(BaseModel):
     picture: str = Field(max_length=100)    
     department_id: int | None = None
     role_id: int | None = None
+    watchlist_id: int | None = None
     password: str = Field(min_length=8, max_length=50)
 
 class UserOut(BaseModel):
@@ -43,6 +46,7 @@ class UserOut(BaseModel):
     picture: str
     department_id: int | None = None
     role_id: int | None = None
+    watchlist_id: int | None = None
 
     class Config:
         #orm_mode = True
@@ -56,4 +60,5 @@ class UserUpdate(BaseModel):
     picture: str = Field(default = None, max_length=100)
     department_id: int | None = None
     role_id: int | None = None
+    watchlist_id: int | None = None
     password: str = Field(default = None, min_length=8, max_length=50)

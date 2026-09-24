@@ -13,6 +13,8 @@ class Watchlist(Base):
     watchlist_name = Column(String(255), nullable=False)
     description = Column(String(255), nullable=True)
 
+    users = relationship("User", back_populates="watchlist")
+
 class WatchlistCreate(BaseModel):
     watchlist_name: str = Field(min_length=2, max_length=100)
     description: str | None = Field(default=None, max_length=255)
