@@ -30,6 +30,10 @@ class User(Base):
     role = relationship("Role", back_populates="users")
     user_cameras = relationship("userCamera", back_populates="user", cascade="all, delete-orphan")
 
+    @property
+    def camera_ids(self) -> list[int]:
+        return [uc.camera_id for uc in self.user_cameras] 
+
 class UserCreate(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     username: str = Field(min_length=2, max_length=100)
@@ -51,9 +55,9 @@ class UserOut(BaseModel):
     department: DepartmentOut | None = None
     role: RoleOut | None = None
     watchlist: WatchlistOut | None = None
+    camera_ids: list[int] = []
 
     class Config:
-        #orm_mode = True
         from_attributes = True
 
 class UserUpdate(BaseModel):
