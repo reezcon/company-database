@@ -4,6 +4,8 @@ from department.schemas import Department
 from roles.schemas import Role
 from user.schemas import User, UserCreate, UserUpdate
 
+from auth.service import hash_password
+
 class UserService:
     def __init__ (self, db:Session):
         self.db = db
@@ -34,7 +36,7 @@ class UserService:
         if payload.role_id is not None and self.db.get(Role, payload.role_id) is None:
             raise LookupError("Role not found")
         data = payload.model_dump(exclude={"password"})
-        user = User(**data, password = payload.password)
+        user = User(**data, password = hash_password(payload.password))
         try:
             self.db.add(user)
             self.db.commit()
@@ -56,6 +58,8 @@ class UserService:
                                exclude_user_id=user_id)
 
         for field, value in updates.items():
+            if field == "password":
+                value = hash_password(value)
             setattr(user, field, value)
         try:
             self.db.commit()

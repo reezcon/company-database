@@ -7,6 +7,7 @@ from camera.apis import router as camera_router
 from department.apis import router as department_router
 from userCamera.apis import router as userCamera_router
 from watchlist.apis import router as watchlist_router
+from auth.apis import router as auth_router
 
 Base.metadata.create_all(bind=get_connection())
 
@@ -18,6 +19,7 @@ app.include_router(camera_router)
 app.include_router(department_router)
 app.include_router(userCamera_router)
 app.include_router(watchlist_router)
+app.include_router(auth_router)
     
 @app.get("/")
 async def root():

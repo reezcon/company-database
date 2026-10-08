@@ -6,6 +6,8 @@ from engine.engine import get_connection, get_db
 from user.schemas import User, UserCreate, UserOut, UserUpdate
 from user.service import UserService as service
 
+from auth.apis import get_current_user 
+
 router = APIRouter(prefix="/users", tags=["Users"])
 session =  Depends(get_db)
 
