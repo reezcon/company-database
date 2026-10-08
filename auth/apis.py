@@ -7,6 +7,7 @@ from auth.schemas import Token
 from engine.engine import get_db
 from auth.service import AuthService as service
 from user.schemas import User, UserOut
+from auth.service import ADMIN, MANAGER
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 session = Depends(get_db)
@@ -25,6 +26,32 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session=session):
     if user is None:
         raise credentials_error
     return user
+
+def role_name(user: User) -> str | None:
+    return user.role.name if user.role else None
+
+# Admin only
+def require_admin(current_user: User = Depends(get_current_user)):
+    if role_name(current_user) != ADMIN:
+        raise HTTPException(status_code=403, detail="You do not have permission")
+    return current_user
+
+# Admin or manager access
+def require_admin_or_manager(current_user: User = Depends(get_current_user)):
+    if role_name(current_user) not in (ADMIN, MANAGER):
+        raise HTTPException(status_code=403, detail="You do not have permission")
+    return current_user
+
+# Own record, or admin
+def require_self_or_admin(user_id: int, current_user: User = Depends(get_current_user)):
+    if current_user.user_id != user_id and role_name(current_user) != ADMIN:
+        raise HTTPException(status_code=403, detail="You do not have permission")
+    return current_user
+
+def require_self_or_admin_or_manager(user_id: int, current_user: User=Depends(get_current_user)):
+    if current_user.user_id != user_id and role_name(current_user) not in (ADMIN, MANAGER):
+        raise HTTPException(status_code=404, detail="You do not have permission")
+    return current_user
 
 # LOGIN
 

@@ -17,6 +17,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 password_hasher = PasswordHash.recommended()
 
+# Roles
+ADMIN = "admin"
+MANAGER = "manager"
+USER = "user"
+
+
 def hash_password(password: str) -> str:
     return password_hasher.hash(password)
 
