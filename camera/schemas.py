@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from engine.engine import Base
@@ -35,8 +35,7 @@ class CameraOut(BaseModel):
     site: str 
     rtsp_url: str 
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class CameraUpdate(BaseModel):
     camera_name: str = Field(default = None, min_length=2, max_length=100)

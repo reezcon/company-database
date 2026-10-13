@@ -5,26 +5,28 @@ from sqlalchemy.orm import Session
 from engine.engine import get_db
 from userCamera.schemas import userCameraUpdate, userCamera, userCameraCreate, userCameraOut
 from userCamera.service import userCameraService as service
+from camera.schemas import CameraOut
+from user.schemas import User
+from auth.service import ADMIN, MANAGER
 
-from auth.apis import require_admin_or_manager, require_self_or_admin_or_manager
+from auth.apis import get_current_user, require_admin_or_manager, require_self_or_admin_or_manager, role_name
 
 router = APIRouter(prefix="/userCameras", tags=["userCameras"])
 session = Depends(get_db)
 
-# READ all user-cameras
-@router.get("", response_model=list[userCameraOut])
-async def read_userCamera(db: Session = session,
-                          _: userCamera = Depends(require_admin_or_manager)):
-    return service(db).get_userCameras()
+# READ all cameras associated with a user
+@router.get("", response_model=list[CameraOut])
+async def read_userCameras(user_id: int, db: Session = session,
+                           _: User = Depends(require_self_or_admin_or_manager)):
+    return service(db).get_userCamerasByUserId(user_id)
 
-# READ one user-camera
-@router.get("/{userCamera_id}", response_model=userCameraOut)
-async def read_userCamera(userCamera_id: int, db: Session = session,
-                          _: userCamera = Depends(require_self_or_admin_or_manager)):
-    user_camera = service(db).get_userCamera(userCamera_id)
-    if user_camera is None:
-        raise HTTPException(status_code=404, detail="User nto found")
-    return user_camera
+# READ all user-camera associations
+@router.get("/associations", response_model=list[userCameraOut])
+async def read_userCameraAssociations(
+    db: Session = session,
+    _: User = Depends(require_admin_or_manager),
+):
+    return service(db).get_userCameras()
 
 # CREATE
 @router.post("", response_model = userCameraCreate)

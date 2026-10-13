@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session 
 from sqlalchemy.exc import SQLAlchemyError
 from userCamera.schemas import userCamera, userCameraCreate, userCameraUpdate
+from camera.schemas import Camera
 
 class userCameraService:
     def __init__(self, db: Session):
@@ -8,6 +9,14 @@ class userCameraService:
 
     def get_userCameras(self):
         return self.db.query(userCamera).all()
+
+    def get_userCamerasByUserId(self, user_id: int):
+        return (
+            self.db.query(Camera)
+            .join(userCamera, userCamera.camera_id == Camera.camera_id)
+            .filter(userCamera.user_id == user_id)
+            .all()
+        )
 
     def get_userCamera(self, userCamera_id: int):
         return self.db.get(userCamera, userCamera_id)
