@@ -28,7 +28,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session=session):
     return user
 
 def role_name(user: User) -> str | None:
-    return user.role.name if user.role else None
+    return user.role.role_name if user.role else None
 
 # Admin only
 def require_admin(current_user: User = Depends(get_current_user)):
