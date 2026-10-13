@@ -5,18 +5,22 @@ from engine.engine import get_db
 from roles.schemas import Role, RoleCreate, RoleOut, RoleUpdate
 from roles.service import RoleService as service
 
+from auth.apis import require_admin_or_manager, require_admin, require_self_or_admin_or_manager
+
 #app = FastAPI()
 router = APIRouter(prefix ="/roles", tags=["Roles"])
 session = Depends(get_db)
 
 # READ all roles
 @router.get("", response_model=list[RoleOut])
-async def read_roles(db: Session = session):
+async def read_roles(db: Session = session,
+                     _: Role = Depends(require_admin_or_manager)):
     return service(db).get_roles()
 
 # READ one role
 @router.get("/{role_id}")
-async def read_role(role_id: int, db:Session = session):
+async def read_role(role_id: int, db:Session = session,
+                    _: Role = Depends(require_self_or_admin_or_manager)):
     
     role = service(db).get_role(role_id)
     
@@ -26,7 +30,8 @@ async def read_role(role_id: int, db:Session = session):
 
 # CREATE
 @router.post("", response_model=RoleOut)
-async def create_role(payload: RoleCreate, db: Session= session):
+async def create_role(payload: RoleCreate, db: Session= session,
+                      _: Role = Depends(require_admin_or_manager)):
     try:
         return service(db).create_role(payload)
     except ValueError as e:
@@ -36,7 +41,8 @@ async def create_role(payload: RoleCreate, db: Session= session):
 
 # UPDATE
 @router.put("/{role_id}", response_model=RoleOut)
-async def update_role(role_id: int, payload: RoleUpdate, db: Session= session) :
+async def update_role(role_id: int, payload: RoleUpdate, db: Session= session,
+                      _: Role = Depends(require_admin_or_manager)) :
     try:
         role = service(db).update_role(role_id, payload)
     except ValueError as e: 
@@ -49,7 +55,8 @@ async def update_role(role_id: int, payload: RoleUpdate, db: Session= session) :
 
 # DELETE
 @router.delete("/{role_id}")
-async def delete_role(role_id: int, db: Session = session):
+async def delete_role(role_id: int, db: Session = session,
+                      _: Role = Depends(require_admin_or_manager)):
     role = service(db).delete_role(role_id)
     if role is None: 
         raise HTTPException(status_code=404, detail = "Role not found")
