@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Boolean, text
 from sqlalchemy.orm import relationship
 
 from department.schemas import DepartmentOut
@@ -24,7 +24,10 @@ class User(Base):
     role_id = Column(Integer, ForeignKey("roles.role_id", ondelete="RESTRICT"), nullable=True, index=True)
     watchlist_id = Column(Integer, ForeignKey("watchlist.watchlist_id"), nullable = True, index= True)
     created_on = Column(DateTime, default=datetime.now)
-
+    is_active = Column(Boolean, nullable=False, default=True, server_default=text("true"))
+    failed_attempts = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    first_failed_at = Column(DateTime, nullable=True)
+    
     watchlist = relationship("Watchlist", back_populates="users")
     department = relationship("Department", back_populates="users")
     role = relationship("Role", back_populates="users")
@@ -52,11 +55,12 @@ class UserOut(BaseModel):
     email: EmailStr
     phone_number: str
     picture: str
+    is_active: bool
     department: DepartmentOut | None = None
     role: RoleOut | None = None
     watchlist: WatchlistOut | None = None
     camera_ids: list[int] = []
-
+    
     class Config:
         from_attributes = True
 
